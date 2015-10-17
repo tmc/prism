@@ -1,2 +1,4 @@
-prism is a package that helps you perofrm HTTP traffic shadowing
-================================================================
+prism
+=====
+
+prism is a package that helps you perform HTTP traffic shadowing
