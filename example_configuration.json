@@ -1,0 +1,21 @@
+{
+  "Splitters": [
+    {
+      "Label": "main",
+      "Source": "http://localhost:8000",
+      "ListenAddr": "localhost:7000",
+      "WaitForResponse": true,
+      "Sinks": [
+        {
+          "Name": "version a",
+          "Addr": "localhost:8001"
+        },
+        {
+          "Name": "version b",
+          "Addr": "localhost:8002"
+        }
+      ]
+    }
+  ],
+  "MonitorAddr": ":7070"
+}
