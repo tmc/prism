@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"time"
 )
 
 // Config is the top level configuration description for a prism Server instance.
@@ -25,8 +24,8 @@ type SplitterConfig struct {
 
 	WaitForResponse    bool // if true, the requests are not relayed to sinks until the upstream response has been read.
 	Sinks              []Sink
-	SinkRequestTimeout time.Duration `json:",omitempty"` // timeout on request to sinks
-	RequestBufferSize  int           `json:",omitempty"` // size of request queue
+	SinkRequestTimeout int `json:",omitempty"` // timeout on request to sinks in seconds
+	RequestBufferSize  int `json:",omitempty"` // size of request queue
 }
 
 // Sink is a downstream http server that gets copies of the incoming requests.

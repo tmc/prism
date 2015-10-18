@@ -7,6 +7,7 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"sync"
+	"time"
 
 	"golang.org/x/net/context"
 
@@ -17,6 +18,7 @@ import (
 // defaultBufferLen is the channel capacity of ongoing request/response pairs
 // this value is used if Config.RequestBufferSize is zero.
 const defaultBufferLen = 1
+const defaultSinkTimeoutSecs = 60
 
 // Splitter is the type that manages an upstream and a number of downstream sinks.
 type Splitter struct {
@@ -34,6 +36,9 @@ func NewSplitter(config config.SplitterConfig) (*Splitter, error) {
 	bufferLen := config.RequestBufferSize
 	if bufferLen == 0 {
 		bufferLen = defaultBufferLen
+	}
+	if config.SinkRequestTimeout == 0 {
+		config.SinkRequestTimeout = defaultSinkTimeoutSecs
 	}
 	s := &Splitter{
 		Config:   config,
@@ -113,7 +118,7 @@ func (s *Splitter) handleRequest(ctx context.Context, reqresp *httputils.Request
 	responsesDone := make(chan struct{})
 	wg := sync.WaitGroup{}
 
-	ctx, _ = context.WithTimeout(ctx, s.Config.SinkRequestTimeout)
+	ctx, _ = context.WithTimeout(ctx, time.Second*time.Duration(s.Config.SinkRequestTimeout))
 	for _, sink := range s.Config.Sinks {
 		wg.Add(1)
 		req, err := httputils.CopyRequest(reqresp.Request)

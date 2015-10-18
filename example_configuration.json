@@ -4,6 +4,7 @@
       "Label": "main",
       "Source": "http://localhost:8000",
       "ListenAddr": "localhost:7000",
+      "SinkRequestTimeout": 30,
       "WaitForResponse": true,
       "Sinks": [
         {
