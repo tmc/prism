@@ -23,6 +23,7 @@ type SplitterConfig struct {
 	WaitForResponse    bool // if true, the requests are not relayed to sinks until the upstream response has been read.
 	Sinks              []Sink
 	SinkRequestTimeout time.Duration `json:",omitempty"` // timeout on request to sinks
+	RequestBufferSize  int           `json:",omitempty"` // size of request queue
 }
 
 type MatcherConfig struct {

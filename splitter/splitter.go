@@ -14,8 +14,11 @@ import (
 	"github.com/tmc/prism/httputils"
 )
 
-const BufferLen = 1
+// defaultBufferLen is the channel capacity of ongoing request/response pairs
+// this value is used if Config.RequestBufferSize is zero.
+const defaultBufferLen = 1
 
+// Splitter is the type that manages an upstream and a number of downstream sinks.
 type Splitter struct {
 	Config config.SplitterConfig
 	Client *http.Client
@@ -26,11 +29,16 @@ type Splitter struct {
 	requests chan *httputils.RequestResponse
 }
 
+// NewSplitter constructs a splitter described by a config.SplitterConfig
 func NewSplitter(config config.SplitterConfig) (*Splitter, error) {
+	bufferLen := config.RequestBufferSize
+	if bufferLen == 0 {
+		bufferLen = defaultBufferLen
+	}
 	s := &Splitter{
 		Config:   config,
 		Client:   http.DefaultClient,
-		requests: make(chan *httputils.RequestResponse, BufferLen),
+		requests: make(chan *httputils.RequestResponse, bufferLen),
 	}
 	s.upstreamProxy = &httputil.ReverseProxy{
 		Director: s.requestDirector,
@@ -41,12 +49,14 @@ func NewSplitter(config config.SplitterConfig) (*Splitter, error) {
 	return s, err
 }
 
+// Start starts an http listener on the address in SplitterConfig.ListenAddress
 func (s *Splitter) Start(ctx context.Context) error {
 	fmt.Println("Starting", s.Config.Label, "on", s.Config.ListenAddr)
 	go s.handleRequests(ctx)
 	return http.ListenAndServe(s.Config.ListenAddr, s)
 }
 
+// ServeHTTP satisfies the net/http.Handler interface
 func (s *Splitter) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	teeRW := httputils.NewTeeResponseWriter(rw)
 
@@ -155,10 +165,4 @@ func (s *Splitter) performSinkRequest(ctx context.Context, req *http.Request, si
 	}
 	result.Response, err = httputils.NewRawResponse(resp)
 	return result, err
-}
-
-func (s *Splitter) SplitterStats() map[string]interface{} {
-	return map[string]interface{}{
-		"implemented": false,
-	}
 }
