@@ -1,11 +1,10 @@
-package splitter
+package prism
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"net/http/httputil"
-	"os"
-	"os/signal"
 	"sync"
 
 	"golang.org/x/net/context"
@@ -15,6 +14,8 @@ import (
 	"github.com/tmc/prism/splitter"
 )
 
+// Server is the primary top level type in prism. It is responsible for reverse-proxying to the
+// upstream and mirroring requests to the sinks.
 type Server struct {
 	config *config.Config
 
@@ -23,7 +24,11 @@ type Server struct {
 	splitters     []*splitter.Splitter
 }
 
+// NewServer constructs a Server from a given config struct
 func NewServer(config *config.Config) (*Server, error) {
+	if config == nil {
+		return nil, fmt.Errorf("prism: got nil config")
+	}
 	s := &Server{
 		config:        config,
 		upstreamProxy: &httputil.ReverseProxy{},
@@ -39,15 +44,17 @@ func NewServer(config *config.Config) (*Server, error) {
 	return s, nil
 }
 
-func (s *Server) Start() error {
+// Start starts listeners and blocks until cancellation
+func (s *Server) Start(ctx context.Context) error {
 	log.Println("Starting monitor on", s.config.MonitorAddr)
 	go func() {
 		http.ListenAndServe(s.config.MonitorAddr, s.monitor)
 	}()
 
-	ctx, cancelFn := context.WithCancel(context.Background())
 	var wg sync.WaitGroup
 	errs := make(chan error)
+	done := make(chan struct{})
+
 	for _, s := range s.splitters {
 		wg.Add(1)
 		go func(s *splitter.Splitter) {
@@ -55,31 +62,23 @@ func (s *Server) Start() error {
 			errs <- s.Start(ctx)
 		}(s)
 	}
-	go func() {
-		c := make(chan os.Signal, 1)
-		signal.Notify(c, os.Interrupt, os.Kill)
-		// Block until a signal is received.
-		s := <-c
-		log.Println("Got signal:", s)
-		cancelFn()
-	}()
-	defer cancelFn()
-	<-ctx.Done()
-	err := ctx.Err()
-	if err == context.Canceled {
-		return nil
+
+	var err error
+	select {
+	case <-ctx.Done():
+		log.Println("got cancellation signal.")
+		err = ctx.Err()
+		if err == context.Canceled {
+			err = nil
+		}
+	case err = <-errs:
+	case <-done:
+		log.Println("all splitters exited.")
 	}
 	return err
 }
 
+// GetConfig returns the confiruation the Server was created with
 func (s *Server) GetConfig() config.Config {
 	return *s.config
-}
-
-//todo remove
-
-func (s *Server) splitterStats() map[string]interface{} {
-	return map[string]interface{}{
-		"implemented": false,
-	}
 }

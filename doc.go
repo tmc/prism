@@ -1,4 +1,4 @@
-/* Package prism is a package that helps you write traffic splitting tools.
+/*Package prism is a package that helps you write traffic splitting tools.
 
 An HTTP splitter sits in line on an http request/response path and replays some
 portion of traffic to additional backends.
@@ -30,4 +30,4 @@ Example configuration:
     ]
   }
 */
-package splitter
+package prism
