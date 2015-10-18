@@ -18,7 +18,7 @@ Example configuration:
 	  "Splitters": [
 	    {
 	      "Label": "main",
-	      "Source": "<a href="http://localhost:8000">http://localhost:8000</a>",
+	      "Source": "http://localhost:8000",
 	      "ListenAddr": "localhost:7000",
 	      "SinkRequestTimeout": 30,
 	      "WaitForResponse": true,
