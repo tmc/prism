@@ -14,7 +14,7 @@ type RequestResponse struct {
 	done      chan struct{}
 }
 
-// Creates a new RequestResponse. Sets StartedAt to time.Now()
+// NewRequestResponse creates a new RequestResponse. Sets StartedAt to time.Now()
 func NewRequestResponse(req *http.Request, resp Response) *RequestResponse {
 	return &RequestResponse{
 		Request:   req,
@@ -24,11 +24,13 @@ func NewRequestResponse(req *http.Request, resp Response) *RequestResponse {
 	}
 }
 
+// MarkDone marks a RequestResponse as completed as in the Response has been generated.
 func (r *RequestResponse) MarkDone() {
 	r.EndedAt = time.Now()
 	close(r.done)
 }
 
+// Done returns a channel that blocks until the RequestResponse is marked as done.
 func (r *RequestResponse) Done() <-chan struct{} {
 	return r.done
 }

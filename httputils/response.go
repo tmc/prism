@@ -5,6 +5,7 @@ import (
 	"net/http"
 )
 
+// Response is an HTTP response.
 type Response interface {
 	ResponseBody() io.ReadCloser
 	StatusCode() int
@@ -18,7 +19,7 @@ type rawResponse struct {
 }
 
 // NewRawResponse consumes an http.Response by reading and closing it's body and replacing it with a byte.Buffer.
-func NewRawResponse(r *http.Response) (*rawResponse, error) {
+func NewRawResponse(r *http.Response) (Response, error) {
 	var err error
 	if r.Body != nil {
 		_, r.Body, err = drainBody(r.Body)

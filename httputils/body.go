@@ -9,7 +9,7 @@ import (
 )
 
 // CopyRequest copies an http.Request in a shallow fashion. All fields are shared except for Body
-// which is read fully from the request and Header which is copied..
+// which is read fully from the request and Header which is copied.
 func CopyRequest(r *http.Request) (*http.Request, error) {
 	body := r.Body
 	var err error
@@ -36,6 +36,7 @@ func CopyRequest(r *http.Request) (*http.Request, error) {
 	}, nil
 }
 
+// CopyHeader copies an http.Header.
 func CopyHeader(h http.Header) http.Header {
 	result := http.Header{}
 	for h, vals := range h {
@@ -46,6 +47,7 @@ func CopyHeader(h http.Header) http.Header {
 	return result
 }
 
+// FreezeBody reads an http.Request's Body and replaces it iwth a bytes.Buffer.
 func FreezeBody(r *http.Request) (io.ReadCloser, error) {
 	var body io.ReadCloser
 	var err error
