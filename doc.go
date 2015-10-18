@@ -9,25 +9,26 @@ traffic to a number of "sinks".
 Example configuration:
 
   {
-    "MonitorAddr": ":7070",
     "Splitters": [
       {
+        "Label": "main",
+        "Source": "http://localhost:8000",
+        "ListenAddr": "localhost:7000",
+        "SinkRequestTimeout": 30,
+        "WaitForResponse": true,
         "Sinks": [
           {
-            "Addr": "localhost:8001",
-            "Name": "version a"
+            "Name": "version a",
+            "Addr": "localhost:8001"
           },
           {
-            "Addr": "localhost:8002",
-            "Name": "version b"
+            "Name": "version b",
+            "Addr": "localhost:8002"
           }
-        ],
-        "WaitForResponse": true,
-        "Source": "localhost:8000",
-        "Addr": "localhost:7000",
-        "Label": "main"
+        ]
       }
-    ]
+    ],
+    "MonitorAddr": ":7070"
   }
 */
 package prism

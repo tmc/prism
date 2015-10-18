@@ -1,8 +1,7 @@
 # prism
     import "github.com/tmc/prism"
 
-Documentation: http://godoc.org/github.com/tmc/prism
-
+[![GoDoc](https://godoc.org/github.com/tmc/prism?status.svg)](http://godoc.org/github.com/tmc/prism)
 
 Package prism is a package that helps you write traffic splitting tools.
 
@@ -16,25 +15,26 @@ Example configuration:
 
 
 	{
-	  "MonitorAddr": ":7070",
 	  "Splitters": [
 	    {
+	      "Label": "main",
+	      "Source": "<a href="http://localhost:8000">http://localhost:8000</a>",
+	      "ListenAddr": "localhost:7000",
+	      "SinkRequestTimeout": 30,
+	      "WaitForResponse": true,
 	      "Sinks": [
 	        {
-	          "Addr": "localhost:8001",
-	          "Name": "version a"
+	          "Name": "version a",
+	          "Addr": "localhost:8001"
 	        },
 	        {
-	          "Addr": "localhost:8002",
-	          "Name": "version b"
+	          "Name": "version b",
+	          "Addr": "localhost:8002"
 	        }
-	      ],
-	      "WaitForResponse": true,
-	      "Source": "localhost:8000",
-	      "Addr": "localhost:7000",
-	      "Label": "main"
+	      ]
 	    }
-	  ]
+	  ],
+	  "MonitorAddr": ":7070"
 	}
 
 
@@ -82,7 +82,6 @@ GetConfig returns the configuration with which the Server was created.
 func (s *Server) Start(ctx context.Context) error
 ```
 Start starts listeners and blocks until cancellation or error.
-
 
 
 
