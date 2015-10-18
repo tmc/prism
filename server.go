@@ -24,7 +24,7 @@ type Server struct {
 	splitters     []*splitter.Splitter
 }
 
-// NewServer constructs a Server from a given config struct
+// NewServer constructs a Server from a given config struct.
 func NewServer(config *config.Config) (*Server, error) {
 	if config == nil {
 		return nil, fmt.Errorf("prism: got nil config")
@@ -44,7 +44,7 @@ func NewServer(config *config.Config) (*Server, error) {
 	return s, nil
 }
 
-// Start starts listeners and blocks until cancellation
+// Start starts listeners and blocks until cancellation or error.
 func (s *Server) Start(ctx context.Context) error {
 	log.Println("Starting monitor on", s.config.MonitorAddr)
 	go func() {
@@ -78,7 +78,7 @@ func (s *Server) Start(ctx context.Context) error {
 	return err
 }
 
-// GetConfig returns the confiruation the Server was created with
+// GetConfig returns the configuration with which the Server was created.
 func (s *Server) GetConfig() config.Config {
 	return *s.config
 }
